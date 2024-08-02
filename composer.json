@@ -1,0 +1,25 @@
+{
+    "name": "synopsie/sofia-updater",
+    "description": "Sofia-Updater est une api permettant à un plugin de vérifier si une nouvelle release est disponible",
+    "type": "library",
+    "require": {
+        "php": "^8.1"
+    },
+    "require-dev": {
+        "pocketmine/pocketmine-mp": "^5.17",
+        "friendsofphp/php-cs-fixer": "^3.61"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Synopsie\\SofiaUpdater\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Dumont-Julien",
+            "email": "dumontj357@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
