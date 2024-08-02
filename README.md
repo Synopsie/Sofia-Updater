@@ -16,3 +16,5 @@ composer require synopsie/sofia-updater
 `````
 
 - Développé par [Synopsie](https://arkaniastudios.com)
+
+![Sofia-Updater](sofia-updater.png)
