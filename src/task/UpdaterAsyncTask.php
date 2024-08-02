@@ -28,16 +28,13 @@ class UpdaterAsyncTask extends AsyncTask {
             $releases = json_decode($json->getBody(), true);
             if ($releases !== null) {
                 foreach ($releases as $release) {
-                    $version = $release["tag_name"];
+                    $version = str_replace("v", "", $release["tag_name"]);
                     if (version_compare($highestVersion, $version, ">=")) {
                         continue;
                     }
                     $highestVersion = $version;
                     $artifactUrl = $release["html_url"];
-                    if (isset($release["body"])) {
-                        preg_match('/API Version: ([\d\.]+(?: - [\d\.]+)?)/', $release["body"], $matches);
-                        $api = $matches[1] ?? "Unknown";
-                    }
+                    $api = $this->pluginName;
                 }
             }
         }
@@ -59,7 +56,7 @@ class UpdaterAsyncTask extends AsyncTask {
         }
 
         if ($highestVersion !== $this->pluginVersion) {
-            $plugin->getLogger()->notice(vsprintf("Version %s has been released for API %s. Download the new release at %s", [$highestVersion, $api, $artifactUrl]));
+            $plugin->getLogger()->notice(vsprintf("Version %s has been released for API %s. Download the new release at %s", ['v' . $highestVersion, $api, $artifactUrl]));
         }
     }
 
