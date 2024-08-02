@@ -35,13 +35,18 @@ class UpdaterAsyncTask extends AsyncTask {
 		private readonly string $pluginName,
 		private readonly string $pluginVersion,
 		private readonly string $githubOwner,
-		private readonly string $githubRepo
+		private readonly string $githubRepo,
+        private readonly string $githubToken
 	) {
 	}
 
 	public function onRun() : void {
 		$url            = sprintf(self::GITHUB_RELEASES_URL, $this->githubOwner, $this->githubRepo);
-		$json           = Internet::getURL($url, 10, ['User-Agent: Sofia-Updater'], $err);
+        $headers = ['User-Agent: Sofia-Updater'];
+        if ($this->githubToken !== "") {
+            $headers[] = 'Authorization: Bearer ' . $this->githubToken;
+        }
+		$json           = Internet::getURL($url, 10, $headers, $err);
 		$highestVersion = $this->pluginVersion;
 		$artifactUrl    = "";
 		$api            = "";
