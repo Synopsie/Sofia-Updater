@@ -10,7 +10,7 @@
  * Sofia-Updater est une api permettant à un plugin de vérifier si une nouvelle release est disponible.
  *
  * @author Synopsie
- * @link https://neta.arkaniastudios.com/
+ * @link https://github.com/Synopsie
  * @version 1.0.0
  *
  */
