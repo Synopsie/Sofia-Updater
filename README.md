@@ -5,7 +5,7 @@
 ## 🛠 Usage
 
 `````php
-Updater::checkUpdate($pluginName, $this->getDescription()->getVersion(), $ownerRepo, $repoName');
+Updater::checkUpdate($pluginName, $this->getDescription()->getVersion(), $ownerRepo, $repoName, $token = null);
 `````
 
 ## 📦 Installation
