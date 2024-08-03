@@ -43,7 +43,7 @@ class UpdaterAsyncTask extends AsyncTask {
 	public function onRun() : void {
 		$url            = sprintf(self::GITHUB_RELEASES_URL, $this->githubOwner, $this->githubRepo);
         $headers = ['User-Agent: Sofia-Updater'];
-        if ($this->githubToken !== "") {
+        if (!is_null($this->githubToken)) {
             $headers[] = 'Authorization: Bearer ' . $this->githubToken;
         }
 		$json           = Internet::getURL($url, 10, $headers, $err);
