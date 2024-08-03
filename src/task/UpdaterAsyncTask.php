@@ -36,7 +36,7 @@ class UpdaterAsyncTask extends AsyncTask {
 		private readonly string $pluginVersion,
 		private readonly string $githubOwner,
 		private readonly string $githubRepo,
-        private readonly string $githubToken
+        private readonly ?string $githubToken
 	) {
 	}
 
