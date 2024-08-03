@@ -63,9 +63,4 @@ final class Updater {
         Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token));
     }
 
-    public function initToken(string $token, string $tokenFile) : void {
-        self::setToken($token, $tokenFile);
-    }
-
-
 }
