@@ -23,7 +23,7 @@ use pocketmine\Server;
 use sofia\task\UpdaterAsyncTask;
 
 final class Updater {
-	public static function checkUpdate(string $name, string $version, string $owner, string $repo) : void {
-		Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo));
+	public static function checkUpdate(string $name, string $version, string $owner, string $repo, string $token = "") : void {
+		Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token));
 	}
 }
