@@ -11,7 +11,7 @@
  *
  * @author Synopsie
  * @link https://github.com/Synopsie
- * @version 1.0.0
+ * @version 1.1.0
  *
  */
 
@@ -22,6 +22,7 @@ namespace sofia\task;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\Internet;
+use function is_null;
 use function json_decode;
 use function sprintf;
 use function str_replace;
@@ -36,16 +37,16 @@ class UpdaterAsyncTask extends AsyncTask {
 		private readonly string $pluginVersion,
 		private readonly string $githubOwner,
 		private readonly string $githubRepo,
-        private readonly ?string $githubToken
+		private readonly ?string $githubToken
 	) {
 	}
 
 	public function onRun() : void {
-		$url            = sprintf(self::GITHUB_RELEASES_URL, $this->githubOwner, $this->githubRepo);
-        $headers = ['User-Agent: Sofia-Updater'];
-        if (!is_null($this->githubToken)) {
-            $headers[] = 'Authorization: Bearer ' . $this->githubToken;
-        }
+		$url     = sprintf(self::GITHUB_RELEASES_URL, $this->githubOwner, $this->githubRepo);
+		$headers = ['User-Agent: Sofia-Updater'];
+		if (!is_null($this->githubToken)) {
+			$headers[] = 'Authorization: Bearer ' . $this->githubToken;
+		}
 		$json           = Internet::getURL($url, 10, $headers, $err);
 		$highestVersion = $this->pluginVersion;
 		$artifactUrl    = "";
