@@ -22,50 +22,89 @@ namespace sofia;
 use Exception;
 use pocketmine\Server;
 use sofia\task\UpdaterAsyncTask;
-use function debug_backtrace;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
-use function in_array;
+
 use const LOCK_EX;
 
 final class Updater {
-	public static function setToken(string $token, string $tokenFile) : void {
-		try {
-			file_put_contents($tokenFile, $token, LOCK_EX);
-		} catch (Exception $e) {
-			echo '§c[Error]' . $e->getMessage();
-		}
-	}
 
-	public static function getToken(string $tokenFile) : ?string {
-		try {
-			if (!file_exists($tokenFile)) {
-				return null;
-			}
-			// Check for debugging attempts
-			if (self::isDebugging()) {
-				throw new Exception('Access to token is blocked.');
-			}
-			return file_get_contents($tokenFile);
-		} catch (Exception $e) {
-			echo '§c[Error]' . $e->getMessage();
-			return null;
-		}
-	}
+    /**
+     * @var string
+     * @experimental
+     */
+    private static string $encryptionKey;
+    /**
+     * @experimental
+     */
+    private const ENCRYPTION_METHOD = 'AES-128-ECB';
 
-	private static function isDebugging() : bool {
-		$backtrace = debug_backtrace();
-		foreach ($backtrace as $trace) {
-			if (isset($trace['function']) && in_array($trace['function'], ['var_dump', 'print_r', 'debug_zval_dump'], true)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * @param string $data
+     * @param string|null $key
+     * @return string
+     * @experimental
+     */
+    private static function encrypt(string $data, ?string $key = null): string {
+        return openssl_encrypt($data, self::ENCRYPTION_METHOD, $key ?? self::$encryptionKey);
+    }
 
-	public static function checkUpdate(string $name, string $version, string $owner, string $repo, ?string $token = null) : void {
-		Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token));
-	}
+    /**
+     * @param string $data
+     * @param string|null $key
+     * @return string
+     * @experimental
+     */
+    private static function decrypt(string $data, ?string $key = null): string {
+        return openssl_decrypt($data, self::ENCRYPTION_METHOD, $key ?? self::$encryptionKey);
+    }
+
+    /**
+     * @param string $token
+     * @param string $file
+     * @return void
+     * @experimental
+     */
+    private static function setToken(string $token, string $file) : void {
+        try {
+            $encryptedToken = self::encrypt($token, self::$encryptionKey);
+            file_put_contents($file, $encryptedToken, LOCK_EX);
+        } catch (Exception $e) {
+            echo '§c[Error]' . $e->getMessage();
+        }
+    }
+
+    /**
+     * @param string $file
+     * @return string|null
+     * @experimental
+     */
+    private static function getToken(string $file) : ?string {
+        try {
+            if (!file_exists($file)) {
+                return null;
+            }
+            $encryptedToken = file_get_contents($file);
+            return self::decrypt($encryptedToken, self::$encryptionKey);
+        } catch (Exception $e) {
+            echo '§c[Error]' . $e->getMessage();
+            return null;
+        }
+    }
+
+    public static function checkUpdate(string $name, string $version, string $owner, string $repo, ?string $token = null) : void {
+        Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token));
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     * @throws \Random\RandomException
+     * @experimental
+     */
+    private static function generateEncryptionKey(int $length = 32): string {
+        return base64_encode(random_bytes($length));
+    }
 
 }
