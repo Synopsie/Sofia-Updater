@@ -21,6 +21,8 @@ namespace sofia\task;
 
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\Internet;
+use pocketmine\utils\Terminal;
+use pocketmine\utils\TextFormat;
 
 use function is_null;
 use function json_decode;
@@ -58,8 +60,9 @@ class UpdaterAsyncTask extends AsyncTask {
             if ($status !== 200) {
                 $error = "Failed to fetch releases. HTTP Status Code: $status";
             } else {
-                $releases = json_decode($response->getBody(), true);
-                if ($releases !== null) {
+                $responseBody = $response->getBody();
+                $releases = json_decode($responseBody, true);
+                if (is_array($releases)) {
                     foreach ($releases as $release) {
                         $version = str_replace("v", "", $release["tag_name"]);
                         if (version_compare($highestVersion, $version, ">=")) {
@@ -81,16 +84,15 @@ class UpdaterAsyncTask extends AsyncTask {
     }
 
     public function onCompletion() : void {
-
         [$highestVersion, $artifactUrl, $api, $err] = $this->getResult();
 
         if ($err !== null) {
-            echo "§c[Sofia-Updater] Update notify error: $err";
+            echo Terminal::$COLOR_RED . "[Sofia-Updater] Update notify error: $err";
             return;
         }
 
         if ($highestVersion !== $this->pluginVersion) {
-            echo "§b[Sofia-Updater]" . vsprintf("Version %s has been released for API %s. Download the new release at %s", ['v' . $highestVersion, $api, $artifactUrl]);
+            echo Terminal::$COLOR_AQUA .  "[Sofia-Updater] " . vsprintf("Version %s has been released for API %s. Download the new release at %s", ['v' . $highestVersion, $api, $artifactUrl]);
         }
     }
 }
