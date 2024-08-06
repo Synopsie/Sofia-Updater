@@ -32,46 +32,35 @@ use function random_bytes;
 use const LOCK_EX;
 
 final class Updater {
-	/**
-	 * @experimental
-	 */
-	private static string $encryptionKey;
 
-	/**
-	 * @experimental
-	 */
+	private static string $encryptionKey;
+    private static string $tokenFile;
+
 	private const ENCRYPTION_METHOD = 'AES-128-ECB';
 
-	/**
-	 * @experimental
-	 */
 	private static function encrypt(string $data, ?string $key = null) : string {
 		return openssl_encrypt($data, self::ENCRYPTION_METHOD, $key ?? self::$encryptionKey);
 	}
 
-	/**
-	 * @experimental
-	 */
 	private static function decrypt(string $data, ?string $key = null) : string {
 		return openssl_decrypt($data, self::ENCRYPTION_METHOD, $key ?? self::$encryptionKey);
 	}
 
-	/**
-	 * @experimental
-	 */
+    public static function setEncryptionKey(string $key) : void {
+        self::$encryptionKey = $key;
+    }
+
 	public static function setToken(string $token, string $file) : void {
 		try {
 			$encryptedToken = self::encrypt($token, self::$encryptionKey);
+            self::$tokenFile = $file;
 			file_put_contents($file, $encryptedToken, LOCK_EX);
 		} catch (Exception $e) {
 			Server::getInstance()->getLogger()->error('Error while setting token: ' . $e->getMessage());
 		}
 	}
 
-	/**
-	 * @experimental
-	 */
-	public static function getToken(string $file) : ?string {
+	private static function getToken(string $file) : ?string {
 		try {
 			if (!file_exists($file)) {
 				return null;
@@ -85,7 +74,7 @@ final class Updater {
 	}
 
 	public static function checkUpdate(string $name, string $version, string $owner, string $repo, ?string $token = null) : void {
-		Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token));
+		Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token ?? self::getToken(self::$tokenFile)));
 	}
 
 	/**
