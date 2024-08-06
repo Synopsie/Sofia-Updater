@@ -74,7 +74,7 @@ final class Updater {
 	}
 
 	public static function checkUpdate(string $name, string $version, string $owner, string $repo, ?string $token = null) : void {
-		Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token ?? self::getToken(self::$tokenFile)));
+		Server::getInstance()->getAsyncPool()->submitTask(new UpdaterAsyncTask($name, $version, $owner, $repo, $token ?? self::getToken(self::$tokenFile ?? '')));
 	}
 
 	/**
