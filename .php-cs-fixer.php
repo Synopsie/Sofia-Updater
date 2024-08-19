@@ -131,7 +131,7 @@ Sofia-Updater est une api permettant à un plugin de vérifier si une nouvelle r
 
 @author Synopsie
 @link https://github.com/Synopsie
-@version 1.2.0
+@version 1.3.0
 
 BODY,
             'location' => 'after_open'
